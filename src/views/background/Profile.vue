@@ -292,7 +292,8 @@ const filteredCountries = computed(() => {
   const query = countrySearchQuery.value.toLowerCase()
   return countries.value.filter(country =>
     country.name.toLowerCase().includes(query) ||
-    country.code.includes(query)
+    country.code.includes(query) ||
+    country.flag.toLowerCase().includes(query)
   )
 })
 
