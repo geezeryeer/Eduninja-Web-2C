@@ -53,7 +53,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { saveAuthToken } from '@/services/AuthService.js'
+import { saveAuthToken, getUserInfo, saveUserInfo } from '@/services/AuthService.js'
 
 // 路由
 const router = useRouter()
@@ -72,17 +72,28 @@ const processCallback = async () => {
     // 从URL参数中获取token、expire、userId
     const token = route.query.token
     const expire = route.query.expire || '43200'
-    
+    const userId = route.query.userId
+
     if (!token) {
       throw new Error('未获取到授权token')
     }
-    
+
+    if (!userId) {
+      throw new Error('未获取到用户ID')
+    }
+
     // 保存token
     saveAuthToken(token, parseInt(expire))
     // 保存用户id
     localStorage.setItem('userId', userId)
-    
+
     console.log('Token保存成功')
+
+    // 获取用户信息
+    console.log('正在获取用户信息...')
+    const userInfo = await getUserInfo(userId)
+    saveUserInfo(userInfo)
+    console.log('用户信息获取并保存成功:', userInfo)
     
     // 显示成功状态
     isLoading.value = false

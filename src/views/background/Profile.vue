@@ -12,8 +12,8 @@
         </svg>
       </div>
       <div class="flex-1 min-w-0">
-        <p class="text-sm font-medium text-gray-900 truncate leading-tight">{{ userName }}</p>
-        <p class="text-xs text-gray-500 truncate leading-tight">{{ userEmail }}</p>
+        <p class="text-sm font-medium text-gray-900 truncate leading-tight">{{ displayUserName }}</p>
+        <p class="text-xs text-gray-500 truncate leading-tight">{{ displayUserPhone }}</p>
       </div>
     </div>
 
@@ -67,10 +67,17 @@
     </Transition>
 
     <!-- 点击外部关闭下拉菜单的遮罩 -->
-    <div 
+    <div
       v-show="isDropdownOpen"
       @click="closeDropdown"
       class="fixed inset-0 z-40"
+    ></div>
+
+    <!-- 点击外部关闭国家下拉菜单的遮罩 -->
+    <div
+      v-show="isCountryDropdownOpen"
+      @click="isCountryDropdownOpen = false"
+      class="fixed inset-0 z-25"
     ></div>
 
     <!-- 编辑个人资料弹窗 -->
@@ -134,34 +141,10 @@
                 </button>
               </div>
 
-              <!-- 用户信息 -->
-              <div class="space-y-4 mb-6">
-                <!-- 邮箱 -->
-                <div class="text-center">
-                  <p class="text-white/60 text-sm mb-1">Email:</p>
-                  <p class="text-white text-base">{{ userProfile.email }}</p>
-                </div>
 
-                <!-- 用户ID -->
-                <div class="text-center">
-                  <p class="text-white/60 text-sm mb-1">User ID:</p>
-                  <div class="flex items-center justify-center gap-2">
-                    <p class="text-white/80 text-sm font-mono">{{ userProfile.userId }}</p>
-                    <button 
-                      @click="copyUserId"
-                      class="text-white/60 hover:text-white transition-colors duration-200"
-                      title="Copy User ID"
-                    >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
 
-              <!-- 姓名输入框 -->
-              <div class="mb-8">
+              <!-- 昵称输入框 -->
+              <div class="mb-6">
                 <div class="relative">
                   <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -171,8 +154,92 @@
                   <input
                     v-model="userProfile.name"
                     type="text"
-                    placeholder="Enter your name"
+                    placeholder="Enter your nickname"
                     class="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-200"
+                  />
+                </div>
+              </div>
+
+              <!-- 手机号输入框 -->
+              <div class="mb-8">
+                <div class="relative">
+                  <!-- 自定义区号选择器 -->
+                  <div class="absolute left-4 top-1/2 transform -translate-y-1/2 z-20">
+                    <div class="relative">
+                      <!-- 区号显示按钮 -->
+                      <button
+                        @click="toggleCountryDropdown"
+                        class="flex items-center gap-2 bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-sm text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all duration-200 min-w-[80px]"
+                      >
+                        <span>{{ selectedCountry.flag }}</span>
+                        <span>{{ selectedCountry.code }}</span>
+                        <svg
+                          class="w-3 h-3 transition-transform duration-200"
+                          :class="{ 'rotate-180': isCountryDropdownOpen }"
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        >
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                      </button>
+
+                      <!-- 下拉菜单 -->
+                      <Transition
+                        enter-active-class="transition ease-out duration-200"
+                        enter-from-class="opacity-0 scale-95 translate-y-1"
+                        enter-to-class="opacity-100 scale-100 translate-y-0"
+                        leave-active-class="transition ease-in duration-150"
+                        leave-from-class="opacity-100 scale-100 translate-y-0"
+                        leave-to-class="opacity-0 scale-95 translate-y-1"
+                      >
+                        <div
+                          v-show="isCountryDropdownOpen"
+                          class="fixed w-80 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 overflow-hidden z-[10001]"
+                          :style="{
+                            top: dropdownPosition.top + 'px',
+                            left: dropdownPosition.left + 'px'
+                          }"
+                        >
+                          <!-- 搜索框 -->
+                          <div class="p-3 border-b border-gray-200/50">
+                            <div class="relative">
+                              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                              </svg>
+                              <input
+                                v-model="countrySearchQuery"
+                                type="text"
+                                placeholder="搜索国家或区号..."
+                                class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500"
+                              />
+                            </div>
+                          </div>
+
+                          <!-- 国家列表 -->
+                          <div class="max-h-60 overflow-y-auto">
+                            <div
+                              v-for="country in filteredCountries"
+                              :key="country.code"
+                              @click="selectCountry(country)"
+                              class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150"
+                            >
+                              <span class="text-lg">{{ country.flag }}</span>
+                              <div class="flex-1">
+                                <span class="text-sm font-medium text-gray-900">{{ country.name }}</span>
+                              </div>
+                              <span class="text-sm text-gray-500">{{ country.code }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </Transition>
+                    </div>
+                  </div>
+
+                  <!-- 手机号输入框 -->
+                  <input
+                    v-model="userProfile.phone"
+                    type="tel"
+                    placeholder="Enter your phone number"
+                    class="w-full pl-28 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-200"
                   />
                 </div>
               </div>
@@ -194,9 +261,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import MiniCalendar from './MiniCalendar.vue'
 import StorageWidget from './StorageWidget.vue'
+import { getStoredUserInfo } from '@/services/AuthService.js'
 
 // Props
 const props = defineProps({
@@ -210,13 +278,129 @@ const props = defineProps({
   }
 })
 
+// 获取真实用户信息
+const storedUserInfo = computed(() => {
+  return getStoredUserInfo() || {}
+})
+
+// 计算显示的用户名和手机号
+const displayUserName = computed(() => {
+  return storedUserInfo.value.title || storedUserInfo.value.accountName || props.userName
+})
+
+// 过滤国家列表
+const filteredCountries = computed(() => {
+  if (!countrySearchQuery.value.trim()) {
+    return countries.value
+  }
+  const query = countrySearchQuery.value.toLowerCase()
+  return countries.value.filter(country =>
+    country.name.toLowerCase().includes(query) ||
+    country.code.includes(query)
+  )
+})
+
+const displayUserPhone = computed(() => {
+  // API返回的数据中没有手机号字段，如果手机号为空则显示提示文字
+  const phone = storedUserInfo.value.phone
+  return phone || '暂未绑定手机号'
+})
+
+// 国家数据
+const countries = ref([
+  { name: '中国', code: '86', flag: '🇨🇳' },
+  { name: '美国', code: '1', flag: '🇺🇸' },
+  { name: '英国', code: '44', flag: '🇬🇧' },
+  { name: '日本', code: '81', flag: '🇯🇵' },
+  { name: '韩国', code: '82', flag: '🇰🇷' },
+  { name: '新加坡', code: '65', flag: '🇸🇬' },
+  { name: '中国香港', code: '852', flag: '🇭🇰' },
+  { name: '中国澳门', code: '853', flag: '🇲🇴' },
+  { name: '中国台湾', code: '886', flag: '🇹🇼' },
+  { name: '马来西亚', code: '60', flag: '🇲🇾' },
+  { name: '泰国', code: '66', flag: '🇹🇭' },
+  { name: '越南', code: '84', flag: '🇻🇳' },
+  { name: '印度', code: '91', flag: '🇮🇳' },
+  { name: '俄罗斯', code: '7', flag: '🇷🇺' },
+  { name: '德国', code: '49', flag: '🇩🇪' },
+  { name: '法国', code: '33', flag: '🇫🇷' },
+  { name: '意大利', code: '39', flag: '🇮🇹' },
+  { name: '西班牙', code: '34', flag: '🇪🇸' },
+  { name: '荷兰', code: '31', flag: '🇳🇱' },
+  { name: '瑞典', code: '46', flag: '🇸🇪' },
+  { name: '挪威', code: '47', flag: '🇳🇴' },
+  { name: '丹麦', code: '45', flag: '🇩🇰' },
+  { name: '芬兰', code: '358', flag: '🇫🇮' },
+  { name: '瑞士', code: '41', flag: '🇨🇭' },
+  { name: '奥地利', code: '43', flag: '🇦🇹' },
+  { name: '比利时', code: '32', flag: '🇧🇪' },
+  { name: '葡萄牙', code: '351', flag: '🇵🇹' },
+  { name: '希腊', code: '30', flag: '🇬🇷' },
+  { name: '波兰', code: '48', flag: '🇵🇱' },
+  { name: '捷克', code: '420', flag: '🇨🇿' },
+  { name: '匈牙利', code: '36', flag: '🇭🇺' },
+  { name: '罗马尼亚', code: '40', flag: '🇷🇴' },
+  { name: '土耳其', code: '90', flag: '🇹🇷' },
+  { name: '阿联酋', code: '971', flag: '🇦🇪' },
+  { name: '沙特阿拉伯', code: '966', flag: '🇸🇦' },
+  { name: '埃及', code: '20', flag: '🇪🇬' },
+  { name: '南非', code: '27', flag: '🇿🇦' },
+  { name: '尼日利亚', code: '234', flag: '🇳🇬' },
+  { name: '肯尼亚', code: '254', flag: '🇰🇪' },
+  { name: '坦桑尼亚', code: '255', flag: '🇹🇿' },
+  { name: '乌干达', code: '256', flag: '🇺🇬' },
+  { name: '加纳', code: '233', flag: '🇬🇭' },
+  { name: '科特迪瓦', code: '225', flag: '🇨🇮' },
+  { name: '喀麦隆', code: '237', flag: '🇨🇲' },
+  { name: '刚果民主共和国', code: '243', flag: '🇨🇩' },
+  { name: '突尼斯', code: '216', flag: '🇹🇳' },
+  { name: '阿尔及利亚', code: '213', flag: '🇩🇿' },
+  { name: '摩洛哥', code: '212', flag: '🇲🇦' },
+  { name: '利比亚', code: '218', flag: '🇱🇾' },
+  { name: '约旦', code: '962', flag: '🇯🇴' },
+  { name: '黎巴嫩', code: '961', flag: '🇱🇧' },
+  { name: '叙利亚', code: '963', flag: '🇸🇾' },
+  { name: '伊拉克', code: '964', flag: '🇮🇶' },
+  { name: '伊朗', code: '98', flag: '🇮🇷' },
+  { name: '阿塞拜疆', code: '994', flag: '🇦🇿' },
+  { name: '格鲁吉亚', code: '995', flag: '🇬🇪' },
+  { name: '亚美尼亚', code: '374', flag: '🇦🇲' },
+  { name: '土库曼斯坦', code: '993', flag: '🇹🇲' },
+  { name: '塔吉克斯坦', code: '992', flag: '🇹🇯' },
+  { name: '吉尔吉斯斯坦', code: '996', flag: '🇰🇬' },
+  { name: '尼泊尔', code: '977', flag: '🇳🇵' },
+  { name: '孟加拉国', code: '880', flag: '🇧🇩' },
+  { name: '缅甸', code: '95', flag: '🇲🇲' },
+  { name: '柬埔寨', code: '855', flag: '🇰🇭' },
+  { name: '老挝', code: '856', flag: '🇱🇦' },
+  { name: '印度尼西亚', code: '62', flag: '🇮🇩' },
+  { name: '菲律宾', code: '63', flag: '🇵🇭' },
+  { name: '巴基斯坦', code: '92', flag: '🇵🇰' },
+  { name: '斯里兰卡', code: '94', flag: '🇱🇰' },
+  { name: '阿富汗', code: '93', flag: '🇦🇫' },
+  { name: '阿曼', code: '968', flag: '🇴🇲' },
+  { name: '卡塔尔', code: '974', flag: '🇶🇦' },
+  { name: '巴林', code: '973', flag: '🇧🇭' },
+  { name: '科威特', code: '965', flag: '🇰🇼' },
+  { name: '也门', code: '967', flag: '🇾🇪' },
+  { name: '巴勒斯坦', code: '970', flag: '🇵🇸' },
+  { name: '以色列', code: '972', flag: '🇮🇱' },
+  { name: '不丹', code: '975', flag: '🇧🇹' },
+  { name: '蒙古', code: '976', flag: '🇲🇳' },
+  { name: '乌兹别克斯坦', code: '998', flag: '🇺🇿' }
+])
+
 // 响应式数据
 const isDropdownOpen = ref(false)
 const showEditProfileModal = ref(false)
+const isCountryDropdownOpen = ref(false)
+const countrySearchQuery = ref('')
+const selectedCountry = ref(countries.value.find(c => c.code === '86') || countries.value[0])
+const dropdownPosition = ref({ top: 0, left: 0 })
 const userProfile = ref({
-  name: 'hao yang',
-  email: 'geezer.yang@gmail.com',
-  userId: '97233659822081'
+  name: '',
+  phone: '',
+  userId: ''
 })
 
 // 方法
@@ -256,6 +440,26 @@ const copyUserId = async () => {
   }
 }
 
+const toggleCountryDropdown = (event) => {
+  isCountryDropdownOpen.value = !isCountryDropdownOpen.value
+  if (isCountryDropdownOpen.value) {
+    countrySearchQuery.value = ''
+    // 计算下拉框位置
+    const button = event.target.closest('button')
+    const rect = button.getBoundingClientRect()
+    dropdownPosition.value = {
+      top: rect.bottom + window.scrollY + 4,
+      left: rect.left + window.scrollX
+    }
+  }
+}
+
+const selectCountry = (country) => {
+  selectedCountry.value = country
+  isCountryDropdownOpen.value = false
+  countrySearchQuery.value = ''
+}
+
 const saveProfile = () => {
   console.log('Saving profile:', userProfile.value)
   // TODO: 实现保存个人资料到服务器的逻辑
@@ -276,6 +480,16 @@ const handleKeydown = (event) => {
 // 生命周期
 onMounted(() => {
   document.addEventListener('keydown', handleKeydown)
+
+  // 初始化用户信息
+  const userInfo = storedUserInfo.value
+  if (userInfo) {
+    userProfile.value = {
+      name: userInfo.title || userInfo.accountName || '',
+      phone: userInfo.phone || '', // API中没有手机号字段，暂时为空
+      userId: userInfo.id || ''
+    }
+  }
 })
 
 onUnmounted(() => {

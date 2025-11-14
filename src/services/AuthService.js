@@ -104,3 +104,78 @@ export const getAuthToken = () => {
   }
   return null
 }
+
+/**
+ * 获取用户信息详情
+ * @param {string} userId - 用户ID
+ * @returns {Promise<Object>} 用户信息
+ */
+export const getUserInfo = async (userId) => {
+  try {
+    const token = getAuthToken()
+    if (!token) {
+      throw new Error('未找到有效的认证token')
+    }
+
+    const response = await fetch(`${Config.APIURL}/api/wx/mine/info-detail`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ id: userId })
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    // 检查API响应是否成功
+    if (data.code !== "200" && data.code !== 200) {
+      throw new Error(data.message || data.msg || '获取用户信息失败')
+    }
+
+    if (!data.successful) {
+      throw new Error(data.message || '获取用户信息失败')
+    }
+
+    return data.data
+  } catch (error) {
+    console.error('获取用户信息失败:', error)
+    throw error
+  }
+}
+
+/**
+ * 保存用户信息到localStorage
+ * @param {Object} userInfo - 用户信息对象
+ */
+export const saveUserInfo = (userInfo) => {
+  localStorage.setItem('userInfo', JSON.stringify(userInfo))
+}
+
+/**
+ * 从localStorage获取用户信息
+ * @returns {Object|null} 用户信息对象
+ */
+export const getStoredUserInfo = () => {
+  const userInfoStr = localStorage.getItem('userInfo')
+  if (userInfoStr) {
+    try {
+      return JSON.parse(userInfoStr)
+    } catch (error) {
+      console.error('解析用户信息失败:', error)
+      return null
+    }
+  }
+  return null
+}
+
+/**
+ * 清除用户信息
+ */
+export const clearUserInfo = () => {
+  localStorage.removeItem('userInfo')
+}
