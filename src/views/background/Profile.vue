@@ -107,10 +107,10 @@
           leave-from-class="opacity-100 scale-100 translate-y-0"
           leave-to-class="opacity-0 scale-95 translate-y-4"
         >
-          <div 
+          <div
             v-show="showEditProfileModal"
             @click.stop
-            class="relative w-full max-w-md bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-purple-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 overflow-hidden z-[10000]"
+            class="relative w-full max-w-md bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-purple-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 z-[10000]"
           >
             <!-- 关闭按钮 -->
             <button
@@ -168,7 +168,7 @@
                     <div class="relative">
                       <!-- 区号显示按钮 -->
                       <button
-                        @click="toggleCountryDropdown"
+                        @click="toggleCountryDropdown($event)"
                         class="flex items-center gap-2 bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-sm text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all duration-200 min-w-[80px]"
                       >
                         <span>{{ selectedCountry.flag }}</span>
@@ -193,11 +193,7 @@
                       >
                         <div
                           v-show="isCountryDropdownOpen"
-                          class="fixed w-80 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 overflow-hidden z-[10001]"
-                          :style="{
-                            top: dropdownPosition.top + 'px',
-                            left: dropdownPosition.left + 'px'
-                          }"
+                          class="absolute bottom-full left-0 mb-2 w-80 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 overflow-hidden z-50"
                         >
                           <!-- 搜索框 -->
                           <div class="p-3 border-b border-gray-200/50">
