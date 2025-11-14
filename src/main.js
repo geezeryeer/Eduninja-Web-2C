@@ -41,7 +41,7 @@ const routes = [
           }
     ]
   },
-  
+
   // 应用布局 - 登录后的功能页面（带侧边栏）
   {
     path: '/library',
@@ -88,7 +88,7 @@ const routes = [
       }
     ]
   },
-  
+
   // 独立页面
   {
     path: '/login',
@@ -96,6 +96,22 @@ const routes = [
     component: () => import('./views/Mainpage/Login.vue'),
     meta: {
       title: 'Sign In'
+    }
+  },
+  {
+    path: '/auth/callback',
+    name: 'AuthCallback',
+    component: () => import('./views/AuthCallback.vue'),
+    meta: {
+      title: '登录中...'
+    }
+  },
+  {
+    path: '/auth/error',
+    name: 'AuthError',
+    component: () => import('./views/AuthError.vue'),
+    meta: {
+      title: '登录失败'
     }
   },
   {
@@ -169,12 +185,12 @@ router.beforeEach(async (to, from, next) => {
   } else {
     document.title = 'EduNinja - AI学习助手'
   }
-  
+
   // 如果进入应用页面，检查是否需要加载筛选数据
   if (to.path.startsWith('/library')) {
     const curriculum = to.query.curriculum
     const subject = to.query.subject
-    
+
     // 如果URL中有课程和学科参数，加载对应的筛选数据
     if (curriculum && subject) {
       try {
@@ -184,13 +200,13 @@ router.beforeEach(async (to, from, next) => {
           clazzId: curriculum,
           subjectId: subject
         })
-        
+
         if (filterData.success) {
           // 将筛选数据存储到sessionStorage供应用使用
           sessionStorage.setItem('filterData', JSON.stringify(filterData))
           sessionStorage.setItem('currentCurriculum', curriculum)
           sessionStorage.setItem('currentSubject', subject)
-          
+
           console.log('✅ 筛选数据已加载:', filterData)
         } else {
           console.warn('⚠️ 加载筛选数据失败:', filterData.message)
@@ -200,7 +216,7 @@ router.beforeEach(async (to, from, next) => {
       }
     }
   }
-  
+
   // 认证检查（暂时跳过）
   if (to.meta.requiresAuth) {
     const token = localStorage.getItem('token')
@@ -209,7 +225,7 @@ router.beforeEach(async (to, from, next) => {
       return
     }
   }
-  
+
   next()
 })
 

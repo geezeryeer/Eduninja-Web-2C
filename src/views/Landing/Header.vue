@@ -137,6 +137,12 @@
         </div>
       </div>
     </transition>
+    
+    <!-- 登录弹窗 -->
+    <LoginModal 
+      :isVisible="showLoginModal" 
+      @close="closeLoginModal"
+    />
   </header>
 </template>
 
@@ -144,12 +150,14 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import appIcon from '@/assets/images/app_icon_tight_1024.png'
+import LoginModal from '@/components/LoginModal.vue'
 
 // 路由
 const router = useRouter()
 
 // 响应式数据
 const showMobileMenu = ref(false)
+const showLoginModal = ref(false)
 
 // 方法
 const toggleMobileMenu = () => {
@@ -170,28 +178,20 @@ const handleLogin = () => {
   console.log('Login button clicked')
   closeMobileMenu()
   
-  // 模拟登录成功，设置认证token
-  localStorage.setItem('token', 'demo-auth-token')
-  console.log('Auth token set, navigating to library...')
-  
-  // 跳转到应用功能页面
-  router.push('/library').then(() => {
-    console.log('Navigation successful to library:', router.currentRoute.value.path)
-  }).catch(error => {
-    console.error('Navigation failed:', error)
-  })
+  // 显示登录弹窗
+  showLoginModal.value = true
+}
+
+const closeLoginModal = () => {
+  showLoginModal.value = false
 }
 
 const handleStartFree = () => {
   console.log('Start for free button clicked')
   closeMobileMenu()
   
-  // 跳转到注册/开始使用页面
-  router.push('/library').then(() => {
-    console.log('Navigation successful to library:', router.currentRoute.value.path)
-  }).catch(error => {
-    console.error('Navigation failed:', error)
-  })
+  // 显示登录弹窗
+  showLoginModal.value = true
 }
 
 const handlePricing = () => {

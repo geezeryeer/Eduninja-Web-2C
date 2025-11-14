@@ -11,10 +11,11 @@ import PastPaperServiceClass, { pastPaperService } from './PastPaperService.js'
 import QuestionServiceClass, { questionService } from './QuestionService.js'
 import { default as subjectService } from './SubjectService.js'
 import { default as filterService } from './FilterService.js'
+import * as AuthService from './AuthService.js'
 
 // 导出服务类
 export { DocServiceClass as DocService, PastPaperServiceClass as PastPaperService, QuestionServiceClass as QuestionService }
-export { docService, pastPaperService, questionService, subjectService, filterService, ActivityType }
+export { docService, pastPaperService, questionService, subjectService, filterService, ActivityType, AuthService }
 
 // 便捷导出所有服务实例
 export const services = {
