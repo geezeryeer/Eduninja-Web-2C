@@ -46,23 +46,25 @@
         
         <!-- 右侧：操作按钮 -->
         <div class="flex items-center space-x-4">
-          <!-- 登录按钮 -->
-          <button 
+          <!-- 登录按钮 - 仅在未登录时显示 -->
+          <button
+            v-if="!isLoggedIn"
             @click="handleLogin"
             class="hidden sm:inline-flex items-center px-5 py-2.5 text-base font-semibold text-gray-700 hover:text-gray-900 transition-colors duration-200"
           >
             Log in
           </button>
-          
-          <!-- Start for free 按钮 - 空心框框 -->
-          <button 
+
+          <!-- Start for free 按钮 - 仅在未登录时显示 -->
+          <button
+            v-if="!isLoggedIn"
             @click="handleStartFree"
             class="inline-flex items-center px-6 py-2.5 bg-white text-black text-base font-medium rounded-full border-2 border-solid border-black hover:bg-black hover:text-white transition-all duration-200"
             style="border: 2px solid #000000;"
           >
             Start for free
           </button>
-          
+
           <!-- 移动端菜单按钮 -->
           <button
             @click="toggleMobileMenu"
@@ -117,16 +119,18 @@
           </div>
           
           <div class="border-t border-gray-200 pt-4">
-            <!-- 移动端登录 -->
-            <button 
+            <!-- 移动端登录 - 仅在未登录时显示 -->
+            <button
+              v-if="!isLoggedIn"
               @click="handleLogin"
               class="w-full flex items-center justify-center space-x-2 px-4 py-3 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-all duration-200"
             >
               <span>Log in</span>
             </button>
-            
-            <!-- 移动端 Start for free -->
-            <button 
+
+            <!-- 移动端 Start for free - 仅在未登录时显示 -->
+            <button
+              v-if="!isLoggedIn"
               @click="handleStartFree"
               class="w-full mt-3 px-6 py-3 bg-white text-black text-base font-medium rounded-full border-2 border-solid border-black hover:bg-black hover:text-white transition-all duration-200"
               style="border: 2px solid #000000;"
@@ -147,10 +151,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import appIcon from '@/assets/images/app_icon_tight_1024.png'
 import LoginModal from '@/components/LoginModal.vue'
+import { isTokenValid } from '@/services/AuthService.js'
 
 // 路由
 const router = useRouter()
@@ -158,6 +163,11 @@ const router = useRouter()
 // 响应式数据
 const showMobileMenu = ref(false)
 const showLoginModal = ref(false)
+
+// 计算属性：检查用户是否已登录
+const isLoggedIn = computed(() => {
+  return isTokenValid()
+})
 
 // 方法
 const toggleMobileMenu = () => {

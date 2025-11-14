@@ -179,3 +179,15 @@ export const getStoredUserInfo = () => {
 export const clearUserInfo = () => {
   localStorage.removeItem('userInfo')
 }
+
+/**
+ * 退出登录，清除所有认证信息
+ */
+export const logout = () => {
+  // 清除认证token
+  clearAuthToken()
+  // 清除用户信息
+  clearUserInfo()
+  // 清除userId（如果单独存储的话）
+  localStorage.removeItem('userId')
+}

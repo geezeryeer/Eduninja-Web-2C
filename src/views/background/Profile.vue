@@ -258,9 +258,10 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import MiniCalendar from './MiniCalendar.vue'
 import StorageWidget from './StorageWidget.vue'
-import { getStoredUserInfo } from '@/services/AuthService.js'
+import { getStoredUserInfo, logout } from '@/services/AuthService.js'
 
 // Props
 const props = defineProps({
@@ -414,12 +415,18 @@ const handleEditProfile = () => {
   showEditProfileModal.value = true
 }
 
+// 获取路由实例
+const router = useRouter()
+
 const handleSignOut = () => {
   closeDropdown()
   console.log('Sign Out clicked')
-  // TODO: 实现登出功能
-  // 清除用户数据，跳转到登录页面
-  // router.push('/login')
+
+  // 执行登出操作
+  logout()
+
+  // 跳转到首页
+  router.push('/')
 }
 
 // 编辑个人资料弹窗方法
