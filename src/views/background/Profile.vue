@@ -299,9 +299,21 @@ const filteredCountries = computed(() => {
 })
 
 const displayUserPhone = computed(() => {
-  // API返回的数据中没有手机号字段，如果手机号为空则显示提示文字
+  // API返回的数据中包含phone和countryCode字段
   const phone = storedUserInfo.value.phone
-  return phone || '暂未绑定手机号'
+  const countryCode = storedUserInfo.value.countryCode
+
+  if (phone) {
+    // 如果有区号，显示完整的国际手机号格式
+    if (countryCode) {
+      return `+${countryCode} ${phone}`
+    }
+    // 如果只有手机号，显示手机号
+    return phone
+  }
+
+  // 如果没有手机号，显示提示文字
+  return '暂未绑定手机号'
 })
 
 // 国家数据
@@ -398,6 +410,7 @@ const dropdownPosition = ref({ top: 0, left: 0 })
 const userProfile = ref({
   name: '',
   phone: '',
+  countryCode: '',
   userId: ''
 })
 
@@ -460,6 +473,8 @@ const toggleCountryDropdown = (event) => {
 
 const selectCountry = (country) => {
   selectedCountry.value = country
+  // 更新userProfile中的countryCode
+  userProfile.value.countryCode = country.code
   isCountryDropdownOpen.value = false
   countrySearchQuery.value = ''
 }
@@ -490,8 +505,17 @@ onMounted(() => {
   if (userInfo) {
     userProfile.value = {
       name: userInfo.title || userInfo.accountName || '',
-      phone: userInfo.phone || '', // API中没有手机号字段，暂时为空
+      phone: userInfo.phone || '',
+      countryCode: userInfo.countryCode || '', // 新增countryCode字段
       userId: userInfo.id || ''
+    }
+
+    // 根据API返回的countryCode设置默认选中的国家
+    if (userInfo.countryCode) {
+      const country = countries.value.find(c => c.code === userInfo.countryCode)
+      if (country) {
+        selectedCountry.value = country
+      }
     }
   }
 })

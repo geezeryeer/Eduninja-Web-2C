@@ -4,7 +4,7 @@
 
 export const Config = {
   // API 基础URL - 对应 Swift Config.APIURL "http://8.155.175.130:8080",
-  APIURL: "http://127.0.0.1:18000",
+  APIURL: "https://callback.eduninja.net",
   
   // 请求超时配置
   TIMEOUT: {
